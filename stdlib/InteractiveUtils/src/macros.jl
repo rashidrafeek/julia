@@ -203,6 +203,20 @@ for fname in [:which, :less, :edit, :functionloc]
     end
 end
 
+# TODO: Expr of type Complex{Float64} and Base.MethodList
+macro edit(ex::Symbol)
+    if !isdefined(__module__, ex)
+        error("\"$ex\" is not defined in module $__module__")
+    end
+    type = eval(ex)
+    if !isa(type, Type)
+        error("expression is not a function call or type")
+    elseif !isconcretetype(type)
+        error("edit only defined for concrete types, $type is not")
+    end
+    return :(edit($ex,fieldtypes($ex)))
+end
+
 macro which(ex0::Symbol)
     ex0 = QuoteNode(ex0)
     return :(which($__module__, $ex0))
