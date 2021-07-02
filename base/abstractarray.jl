@@ -1133,7 +1133,7 @@ function copymutable(a::AbstractArray)
 end
 copymutable(itr) = collect(itr)
 
-zero(x::AbstractArray{T}) where {T} = fill!(similar(x), zero(T))
+zero(x::AbstractArray{T}) where {T} = fill!(similar(x, typeof(zero(T))), zero(T))
 
 ## iteration support for arrays by iterating over `eachindex` in the array ##
 # Allows fast iteration by default for both IndexLinear and IndexCartesian arrays
@@ -2300,8 +2300,8 @@ function _typed_hvncat(::Type{T}, dims::Tuple{Vararg{Int, N}}, row_first::Bool, 
         len += cat_length(a)
     end
     outlen = prod(outdims)
-    outlen == 0 && ArgumentError("too few elements in arguments, unable to infer dimensions") |> throw
-    len == outlen || ArgumentError("too many elements in arguments; expected $(outlen), got $(len)") |> throw
+    outlen == 0 && throw(ArgumentError("too few elements in arguments, unable to infer dimensions"))
+    len == outlen || throw(ArgumentError("too many elements in arguments; expected $(outlen), got $(len)"))
 
     # copy into final array
     A = cat_similar(as[1], T, outdims)
